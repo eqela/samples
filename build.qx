@@ -26,7 +26,6 @@ tool eqela:sling:r300
 tool igelle:tools:r2
 lib eqela:jkop:r3
 set version ${date}
-set name eqela-cli-${date}
 
 default {
 	info Use target `html' for to compile for the web
