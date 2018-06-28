@@ -1,0 +1,111 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+class #webapi:
+
+import sympathy
+import sympathy.webapi
+
+prop manager as DatabaseManager
+
+POST "register"
+{
+	var data = assert req.getBodyJSONMap():
+		req.sendJSONObject(JSONResponse.forInvalidRequest())
+	manager.register(data, func(error as Error) {
+		assert not error:
+			req.sendJSONObject(JSONResponse.forError(error))
+		req.sendJSONObject(JSONResponse.forOk())
+	})
+}
+
+POST "login"
+{
+	var data = assert req.getBodyJSONMap():
+		req.sendJSONObject(JSONResponse.forInvalidRequest())
+	manager.login(data, func(session as Session, error as Error) {
+		assert not error:
+			req.sendJSONObject(JSONResponse.forError(error))
+		assert session:
+			req.sendJSONObject(JSONResponse.forInternalError())
+		req.sendJSONObject(JSONResponse.forOk(session.toDynamicMap()))
+	})
+}
+
+DELETE "logout"
+{
+	manager.logout(req.getSession() as Session, func(error as Error) {
+		assert not error:
+			req.sendJSONObject(JSONResponse.forError(error))
+		req.sendJSONObject(JSONResponse.forOk())
+	})
+}
+
+GET "persons"
+{
+	manager.getPersons(func(persons as DynamicVector) {
+		req.sendJSONObject(JSONResponse.forOk(persons))
+	})
+}
+
+GET "persons/*"
+{
+	manager.getPerson(req.popResource(), func(person as Person, error as Error) {
+		assert not error:
+			req.sendJSONObject(JSONResponse.forError(error))
+		req.sendJSONObject(JSONResponse.forOk(person.toDynamicMap()))
+	})
+}
+
+POST "persons"
+{
+	var data = assert req.getBodyJSONMap():
+		req.sendJSONObject(JSONResponse.forInvalidRequest())
+	manager.addPerson(data, func(error as Error) {
+		assert not error:
+			req.sendJSONObject(JSONResponse.forError(error))
+		req.sendJSONObject(JSONResponse.forOk())
+	})
+}
+
+PUT "persons/*"
+{
+	var data = assert req.getBodyJSONMap():
+		req.sendJSONObject(JSONResponse.forInvalidRequest())
+	data.set("personId", req.popResource())
+	manager.updatePerson(data, func(error as Error) {
+		assert not error:
+			req.sendJSONObject(JSONResponse.forError(error))
+		req.sendJSONObject(JSONResponse.forOk())
+	})
+}
+
+DELETE "persons/*"
+{
+	manager.deletePerson(req.popResource(), func(error as Error) {
+		assert not error:
+			req.sendJSONObject(JSONResponse.forError(error))
+		req.sendJSONObject(JSONResponse.forOk())
+	})
+}
