@@ -284,23 +284,3 @@ func deletePerson(personId as string, callback as function<void, Error>)
 		})
 	})
 }
-
-// func updatePerson(String name, String new_name, int age, String gender) as bool
-// {
-// 	return(db.execute(db.prepare("UPDATE persons SET name = ?, age = ?, gender = ? WHERE name = ?;")
-// 		.add_param_str(new_name)
-// 		.add_param_int(age)
-// 		.add_param_str(gender)
-// 		.add_param_str(name)));
-// }
-
-// func deletePerson(String name) as bool
-// {
-// 	return(db.execute(db.prepare("DELETE FROM persons WHERE name = ?;")
-// 		.add_param_str(name)));
-// }
-
-// func deletePersons() as bool
-// {
-// 	return(db.execute(db.prepare("DELETE FROM persons;")));
-// }
