@@ -1,0 +1,65 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+class is WebServerWithDatabase:
+
+import sympathy
+import sympathy.dbapp
+
+func main(args as array<string>) static as int #main:
+	return new this().executeMain(args)
+
+var manager private as DatabaseManager
+
+func initializeServer(server as HTTPServer) override as bool
+{
+	assert base.initializeServer(server):
+		Log.error(ctx, "Failed to initialize HTTP server.")
+	manager = DatabaseManager.forSQLDatabase(getDb())
+	assert manager:
+		Log.error(ctx, "Failed to initialize database manager.")
+	var handler = new WebAPIHandler()
+		.setManager(manager)
+	server.pushRequestHandler(func(req as HTTPServerRequest, next as function) {
+		var path = req.peekResource()
+		if String.equals("register", path) || String.equals("login", path) {
+			next()
+			return
+		}
+		var sessionId = req.getHeader("x-session")
+		manager.checkSession(sessionId, func(session as Session, error as Error) {
+			assert not error:
+				req.sendJSONObject(JSONResponse.forError(error))
+			assert session:
+				req.sendJSONObject(JSONResponse.forInternalError())
+			req.setSession(session)
+			next()
+		})
+	})
+	server.pushRequestHandler(handler)
+	return true
+}
+
+func onMaintenance override:
+	manager.onMaintenance(ctx)

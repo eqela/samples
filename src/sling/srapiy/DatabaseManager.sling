@@ -1,0 +1,286 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+class:
+
+import capex.crypto
+import capex.data
+
+const USERS_TABLE = "users"
+const SESSIONS_TABLE = "sessions"
+const PERSONS_TABLE = "persons"
+const BCRYPT_ITERATION_COUNT = 12
+
+func forSQLDatabase(db as SQLDatabase) static as this
+{
+	assert db
+	var v = new this()
+	v.setDb(db)
+	assert v.initialize()
+	return v
+}
+
+prop db as SQLDatabase
+prop sessionTTL as long = 60 * 60 * 24
+var bcrypt private as BCryptEncoder
+var sha private as SHAEncoder
+var random private as Random
+
+ctor
+{
+	bcrypt = BCryptEncoder.create()
+	sha = SHAEncoder.create()
+	random = new Random()
+}
+
+func initialize as bool
+{
+	assert db
+	var tables = new SQLTableInfo[] {
+		User.SQL.getTableInfo(USERS_TABLE),
+		Session.SQL.getTableInfo(SESSIONS_TABLE),
+		Person.SQL.getTableInfo(PERSONS_TABLE)
+	}
+	foreach table in tables:
+		assert db.ensureTableExists(table)
+	return true
+}
+
+func onMaintenance(ctx as LoggingContext)
+{
+	var now = SystemClock.asUTCSeconds()
+	var expired = now - sessionTTL
+	db.execute(db.prepare("DELETE FROM " .. SESSIONS_TABLE .. " WHERE timeStamp < ?;").addParamLongInteger(expired), func(success as bool) {
+		assert success:
+			Log.error(ctx, "Session Maintenance: Failed to delete sessions older than: '" .. String.forInteger(expired) .. "' now: '" .. String.forInteger(now) .. "'")
+		Log.debug(ctx, "Session Maintenance: Deleted sessions older than: '" .. String.forInteger(expired) .. "' now: '" .. String.forInteger(now) .. "'")
+	})
+}
+
+func register(data as DynamicMap, callback as function<void, Error>)
+{
+	assert data:
+		callback(Error.instance("no_data", "No data"))
+	User.forValidDynamicMap(data, func(user as User, error as Error) {
+		assert not error:
+			callback(error)
+		assert user:
+			callback(Error.instance("internal_error", "Internal error occured."))
+		User.SQL.queryByUsername(db, USERS_TABLE, user.getUsername(), func(existingUser as User) {
+			assert not existingUser:
+				callback(Error.instance("duplicate_username", "The username you specified already exists. Please specify another one and try again."))
+			var passwordHash = bcrypt.hashPassword(user.getPassword(), bcrypt.generateSalt(BCRYPT_ITERATION_COUNT))
+			assert String.isNotEmpty(passwordHash):
+				callback(Error.instance("internal_error", "Internal error occured."))
+			user.setPassword(passwordHash)
+			User.SQL.insert(db, USERS_TABLE, user, func(success as bool) {
+				assert success:
+					callback(Error.instance("internal_error", "Internal error occured"))
+				callback(null)
+			})
+		})
+	})
+}
+
+func generateCode(prefix as string = null) private as string:
+	return hashText(generateId(prefix))
+
+func hashText(rawText as string) private as string:
+	return sha.encodeAsString(String.toUTF8Buffer(rawText), SHAEncoder.SHA256)
+
+func generateId(prefix as string = null, length as int = 64, allCaps as bool = true) private as string
+{
+	var sb = StringBuilder.forString(prefix)
+	var l = length
+	if l < 8:
+		l = 8
+	for(var i = 0; i < l; i++) {
+		if random.nextInt(0, 2) == 0 {
+			sb.append(random.nextInt(48, 58) as! char)
+		}
+		else {
+			if allCaps {
+				sb.append(Character.toUppercase(random.nextInt(97, 123) as! char))
+			}
+			else {
+				if random.nextInt(0, 2) == 0 {
+					sb.append(Character.toUppercase(random.nextInt(97, 123) as! char))
+				}
+				else {
+					sb.append(random.nextInt(97, 123) as! char)
+				}
+			}
+		}
+	}
+	return sb.toString()
+}
+
+func login(data as DynamicMap, callback as function<void, Session, Error>)
+{
+	assert data:
+		callback(null, Error.instance("no_data", "No data"))
+	User.forValidDynamicMap(data, func(credentials as User, error as Error) {
+		assert not error:
+			callback(null, error)
+		assert credentials:
+			callback(null, Error.instance("internal_error", "Internal error occured."))
+		User.SQL.queryByUsername(db, USERS_TABLE, credentials.getUsername(), func(user as User) {
+			assert user:
+				callback(null, Error.instance("invalid_username", "The username you specified is invalid. Please check your spelling and try again."))
+			var password = credentials.getPassword()
+			assert bcrypt.checkPassword(password, user.getPassword()):
+				callback(null, Error.instance("incorrect_password", "You have entered an incorrect password. Please try again."))
+			var session = new Session()
+			session.setSessionId(generateCode())
+			session.setUsername(user.getUsername())
+			session.setTimeStamp(SystemClock.asUTCSeconds())
+			Session.SQL.insert(db, SESSIONS_TABLE, session, func(success as bool) {
+				assert success:
+					callback(null, Error.instance("internal_error", "Internal error occured."))
+				callback(session, null)
+			})
+		})
+	})
+}
+
+func logout(session as Session, callback as function<void, Error>)
+{
+	Session.SQL.deleteFromTable(db, SESSIONS_TABLE, session, func(success as bool) {
+		assert success:
+			callback(Error.instance("internal_error", "Internal error occured."))
+		callback(null)
+	})
+}
+
+func checkSession(sessionId as string, callback as function<void, Session, Error>)
+{
+	assert String.isNotEmpty(sessionId):
+		callback(null, Error.instance("not_authenticated", "Not authenticated"))
+	Session.SQL.queryBySessionId(db, SESSIONS_TABLE, sessionId, func(session as Session) {
+		assert session:
+			callback(null, Error.instance("not_authenticated", "Your session is invalid or has expired. Please login."))
+		session.setTimeStamp(SystemClock.asUTCSeconds())
+		Session.SQL.update(db, SESSIONS_TABLE, session, func(success as bool) {
+			assert success:
+				callback(null, Error.instance("internal_error", "Internal error occured."))
+			callback(session, null)
+		})
+	})
+}
+
+func getPersons(callback as function<void, DynamicVector>)
+{
+	Person.SQL.queryAll(db, PERSONS_TABLE, [ SQLOrderingRule.forAscending("name") ], func(itr as Iterator<Person>) {
+		assert itr:
+			callback(null)
+		var persons = new DynamicVector()
+		loop {
+			var person = itr.next()
+			if not person:
+				break
+			persons.append(person.toDynamicMap())
+		}
+		callback(persons)
+	})
+}
+
+func getPerson(personId as string, callback as function<void, Person, Error>)
+{
+	assert String.isNotEmpty(personId):
+		callback(null, Error.instance("no_person_id", "Please specify person id."))
+	Person.SQL.queryByPersonId(db, PERSONS_TABLE, personId, func(person as Person) {
+		assert person:
+			callback(null, Error.instance("invalid_person_id", "The person id you specified is invalid. Please check your spelling and try again."))
+		callback(person, null)
+	})
+}
+
+// func getPersons() as DynamicVector
+// {
+// 	var persons = db.query(db.prepare("SELECT * FROM persons;"));
+// 	if(persons == null) {
+// 		return(null);
+// 	}
+// 	return(LinkedList.for_iterator(persons));
+// }
+
+// func getPerson(String name) as DynamicMap
+// {
+// 	return(db.query_single_row(db.prepare("SELECT * FROM persons WHERE name = ?;")
+// 		.add_param_str(name)));
+// }
+
+func addPerson(data as DynamicMap, callback as function<void, Error>)
+{
+	assert data:
+		callback(Error.instance("no_data", "No data"))
+	Person.forValidDynamicMap(data, func(person as Person, error as Error) {
+		assert not error:
+			callback(error)
+		assert person:
+			callback(Error.instance("internal_error", "Internal error occured."))
+		person.setPersonId(generateId())
+		Person.SQL.insert(db, PERSONS_TABLE, person, func(success as bool) {
+			assert success:
+				callback(Error.instance("internal_error", "Internal error occured"))
+			callback(null)
+		})
+	})
+}
+
+func updatePerson(data as DynamicMap, callback as function<void, Error>)
+{
+	assert data:
+		callback(Error.instance("no_data", "No data"))
+	Person.forValidDynamicMap(data, func(person as Person, error as Error) {
+		assert not error:
+			callback(error)
+		assert person:
+			callback(Error.instance("internal_error", "Internal error occured."))
+		Person.SQL.queryByPersonId(db, PERSONS_TABLE, person.getPersonId(), func(currentPerson as Person) {
+			assert currentPerson:
+				callback(Error.instance("invalid_person_id", "The person id you specified is invalid. Please check your spelling and try again."))
+			Person.SQL.update(db, PERSONS_TABLE, person, func(success as bool) {
+				assert success:
+					callback(Error.instance("internal_error", "Internal error occured"))
+				callback(null)
+			})
+		})
+	})
+}
+
+func deletePerson(personId as string, callback as function<void, Error>)
+{
+	assert String.isNotEmpty(personId):
+		callback(Error.instance("no_person_id", "Please specify person id."))
+	Person.SQL.queryByPersonId(db, PERSONS_TABLE, personId, func(person as Person) {
+		assert person:
+			callback(Error.instance("invalid_person_id", "The person id you specified is invalid. Please check your spelling and try again."))
+		Person.SQL.deleteFromTable(db, PERSONS_TABLE, person, func(success as bool) {
+			assert success:
+				callback(Error.instance("internal_error", "Internal error occured."))
+			callback(null)
+		})
+	})
+}
