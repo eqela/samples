@@ -1,0 +1,14 @@
+use eqela:slingc:r311
+use eqela:jsh:r2
+use eqela:jkop:20180712
+use eqela:dotnet:2.1.301
+use eqela:builder:r2
+
+default {
+	info Usage: buildapp app=<appname>
+}
+
+buildapp {
+	eqela:jsh delete build/${app}
+	eqela:slingc ${app} -target=netcore -output=build/${app} -libdir=${eqela:jkop}/src -builder=${(eqela:builder)} -BdotnetPath=${eqela:dotnet}
+}

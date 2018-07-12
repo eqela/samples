@@ -36,7 +36,9 @@ func main(args as array<string>) as int #main
 		PRINT "Failed to read file: " .. args[0]
 		return 1
 	}
-	var tt = TextTemplate.forHTMLString(cc, Vector.forArray([ ff.getParent() ]) as! vector<File>)
+	var fs = new vector<File>
+	fs += ff.getParent()
+	var tt = TextTemplate.forHTMLString(cc, fs)
 	if not tt {
 		PRINT "Failed to process HTML template: " .. args[0]
 		return 1
