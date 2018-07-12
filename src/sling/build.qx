@@ -8,7 +8,12 @@ default {
 	info Usage: buildapp app=<appname>
 }
 
-buildapp {
-	eqela:jsh delete build/${app}
-	eqela:slingc ${app} -target=netcore -output=build/${app} -libdir=${eqela:jkop}/src -builder=${(eqela:builder)} -BdotnetPath=${eqela:dotnet}
+buildnetcore {
+	eqela:jsh delete build/netcore/${app}
+	eqela:slingc ${app} -target=netcore -output=build/netcore/${app} -libdir=${eqela:jkop}/src -builder=${(eqela:builder)} -BdotnetPath=${eqela:dotnet}
+}
+
+buildweb {
+	eqela:jsh delete build/web/${app}
+	eqela:slingc ${app} -target=html5 -output=build/web/${app} -libdir=${eqela:jkop}/src
 }
