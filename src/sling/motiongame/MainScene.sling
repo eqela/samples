@@ -22,7 +22,11 @@
  * SOFTWARE.
  */
 
-class is SpriteSceneWithEntities imports cape imports cave imports motion:
+class is SpriteSceneWithEntities:
+
+import cape
+import cave
+import motion
 
 class TextEntity is SpriteEntity
 {
@@ -37,7 +41,7 @@ class TextEntity is SpriteEntity
 		myText.setFontFamily("Arial")
 		var text = layer.addTextSprite(myText)
 		text.move(0.1, 0.1 * layer.getReferenceHeight())
-		return(text)
+		return text
 	}
 
 	func tick(gameTime as TimeValue, delta as double) override
@@ -71,7 +75,7 @@ class BoxEntity is SpriteEntity
 	{
 		var box = SpriteUtil.addColorSprite(scene, layer, Color.forRGB(0, 0, 255), 0.2 * layer.getReferenceHeight())
 		box.move(0.4, 0.4 * layer.getReferenceHeight())
-		return(box)
+		return box
 	}
 
 	func tick(gameTime as TimeValue, delta as double) override
@@ -108,16 +112,15 @@ class SuperTextEntity is SpriteEntity
 		xtext.setFontIsItalic(true)
 		var superText = layer.addTextSprite(xtext)
 		superText.move(0.5 - superText.getWidth() / 2, superText.getHeight() / 2)
-		return(superText)
+		return superText
 	}
 
 	func tick(gameTime as TimeValue, delta as double) override
 	{
 		base.tick(gameTime, delta)
 		var sa = sprite.getAlpha() - delta * 0.2
-		if(sa < 0.0) {
+		if sa < 0.0:
 			sa = 1.0
-		}
 		sprite.setAlpha(sa)
 	}
 }
@@ -164,70 +167,61 @@ func initialize override
 
 func onMoveUp
 {
-	if(clip != null) {
+	if clip:
 		clip.play()
-	}
-	if(logo != null) {
+	if logo:
 		logo.move(logo.getX(), logo.getY() - 0.01*getReferenceHeight())
-	}
 }
 
 func onMoveDown
 {
-	if(clip != null) {
+	if clip:
 		clip.play()
-	}
-	if(logo != null) {
+	if logo:
 		logo.move(logo.getX(), logo.getY() + 0.01*getReferenceHeight())
-	}
 }
 
 func onMoveLeft
 {
-	if(clip != null) {
+	if clip:
 		clip.play()
-	}
-	if(logo != null) {
+	if logo:
 		logo.move(logo.getX() - 0.01*getReferenceWidth(), logo.getY())
-	}
 }
 
 func onMoveRight
 {
-	if(clip != null) {
+	if clip:
 		clip.play()
-	}
-	if(logo != null) {
+	if logo:
 		logo.move(logo.getX() + 0.01*getReferenceWidth(), logo.getY())
-	}
 }
 
 func onKeyEvent(event as KeyEvent) override
 {
-	if(event.isKey(KeyEvent.KEY_UP)) {
+	if event.isKey(KeyEvent.KEY_UP) {
 		onMoveUp()
 	}
-	else if(event.isKey(KeyEvent.KEY_DOWN)) {
+	else if event.isKey(KeyEvent.KEY_DOWN) {
 		onMoveDown()
 	}
-	else if(event.isKey(KeyEvent.KEY_LEFT)) {
+	else if event.isKey(KeyEvent.KEY_LEFT) {
 		onMoveLeft()
 	}
-	else if(event.isKey(KeyEvent.KEY_RIGHT)) {
+	else if event.isKey(KeyEvent.KEY_RIGHT) {
 		onMoveRight()
 	}
 	else {
-		PRINT("Unhandled key event: `" .. event.getStringValue() .. "'")
+		PRINT "Unhandled key event: `" .. event.getStringValue() .. "'"
 	}
 }
 
 func onPointerEvent(event as PointerEvent) override
 {
 	base.onPointerEvent(event)
-	if(event.isConsumed) {
+	if event.isConsumed:
 		return
-	}
-	if(event.action == PointerEvent.DOWN) {
+	if event.action == PointerEvent.DOWN {
 		var logo = new LogoEntity()
 		addEntity(logo)
 		logo.move(event.getX() - (logo.getWidth()/2), event.getY() - (logo.getHeight()/2))

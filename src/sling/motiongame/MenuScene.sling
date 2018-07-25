@@ -22,7 +22,11 @@
  * SOFTWARE.
  */
 
-class is SpriteSceneWithEntities imports cape imports cave imports motion #mainScene:
+class is SpriteSceneWithEntities #mainScene:
+
+import cape
+import cave
+import motion
 
 func initialize override
 {
