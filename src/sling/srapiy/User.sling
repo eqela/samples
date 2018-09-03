@@ -31,11 +31,56 @@ prop password as string #dataField
 
 func validate(callback as function<void, Error>)
 {
-	username = String.strip(username)
 	assert String.isNotEmpty(username):
 		callback(Error.instance("no_username", "Please specify your username."))
-	password = String.strip(password)
+	var length = String.getLength(username)
+	assert length >= 8 && length <= 15:
+		callback(Error.instance("invalid_username_length", "Please specify your username with a length from 8 to 15 characters long."))
+	var itr = assert String.iterate(username):
+		callback(Error.instance("internal_error", "Internal error occured."))
+	loop {
+		var c = itr.getNextChar()
+		if c < 1:
+			break
+		if((c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 48 && c <= 57)):
+			continue
+		callback(Error.instance("invalid_username", "Please specify your username with alphanumeric characters only (a-z, A-Z, 0-9)."))
+		return
+	}
 	assert String.isNotEmpty(password):
 		callback(Error.instance("no_password", "Please specify your password."))
+	length = String.getLength(password)
+	assert length >= 8 && length <= 15:
+		callback(Error.instance("invalid_password_length", "Please specify your password with atleast 8 characters long."))
+	var hasLowerAlpha = false
+	var hasUpperAlpha = false
+	var hasNumeric = false
+	var hasSpecial = false
+	assert itr = String.iterate(password):
+		callback(Error.instance("internal_error", "Internal error occured."))
+	loop {
+		var c = itr.getNextChar()
+		if c < 1:
+			break
+		if c > 32 && c < 127 {
+			if c >= 65 && c <= 90 {
+				hasUpperAlpha = true
+			}
+			else if c >= 97 && c <= 122 {
+				hasLowerAlpha = true
+			}
+			else if c >= 48 && c <= 57 {
+				hasNumeric = true
+			}
+			else {
+				hasSpecial = true
+			}
+			continue
+		}
+		callback(Error.instance("invalid_password", "Please specify your password with a combination of uppercase and lowercase characters, numeric characters, and special characters (but not whitespace characters)."))
+		return
+	}
+	assert hasLowerAlpha && hasUpperAlpha && hasNumeric && hasSpecial:
+		callback(Error.instance("invalid_password", "Please specify your password with a combination of uppercase and lowercase characters, numeric characters, and special characters (but not whitespace characters)."))
 	callback(null)
 }
