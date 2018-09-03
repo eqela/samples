@@ -25,7 +25,7 @@
 class #webapi:
 
 import sympathy
-import sympathy.webapi
+import symlib.webapi
 
 prop manager as DatabaseManager
 

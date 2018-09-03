@@ -36,8 +36,7 @@ func initializeServer(server as HTTPServer) override as bool
 {
 	assert base.initializeServer(server):
 		Log.error(ctx, "Failed to initialize HTTP server.")
-	manager = DatabaseManager.forSQLDatabase(getDb())
-	assert manager:
+	assert manager = DatabaseManager.forSQLDatabase(getDb()):
 		Log.error(ctx, "Failed to initialize database manager.")
 	var handler = new WebAPIHandler()
 		.setManager(manager)
