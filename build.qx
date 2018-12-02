@@ -34,6 +34,7 @@ all {
 	call buildSlingApp id=gamescenewithentities target=html5
 	call buildSlingApp id=hellogui target=html5
 	call buildSlingApp id=helloworld target=netcore
+	call buildSlingApp id=helloy target=netcore
 	call buildSlingApp id=httpclient target=netcore
 	call buildSlingApp id=httpd target=netcore
 	call buildSlingApp id=menubar target=html5
@@ -47,6 +48,11 @@ all {
 	call buildSlingApp id=web2y target=netcore
 	call buildSlingApp id=websocketclient target=html5
 	call buildSlingApp id=websockety target=netcore
+}
+
+buildHelloy {
+	use eqela:slingbuild:r27
+	eqela:slingbuild buildEqelaPackageFromSource src=src/sling/helloy name=helloy vendor=eqela version=${version}
 }
 
 buildSlingApp : id target {
