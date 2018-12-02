@@ -22,30 +22,48 @@
 # SOFTWARE.
 #
 
-tool eqela:sling:r300
-tool igelle:tools:r2
-lib eqela:jkop:r3
+use eqela:slingc:r330
+use eqela:jsh:r4
+use eqela:jkop:20181124
 set version ${date}
 
-default {
-	info Use target `html' for to compile for the web
-}
-
-html {
+all {
 	call buildSlingApp id=custom-rendering-widget target=html5
 	call buildSlingApp id=datagrid target=html5
 	call buildSlingApp id=graphs target=html5
+	call buildSlingApp id=gamescenewithentities target=html5
 	call buildSlingApp id=hellogui target=html5
+	call buildSlingApp id=helloworld target=netcore
+	call buildSlingApp id=httpclient target=netcore
+	call buildSlingApp id=httpd target=netcore
 	call buildSlingApp id=menubar target=html5
+	call buildSlingApp id=motiongame target=html5
+	call buildSlingApp id=slingcat target=netcore
+	call buildSrapiy
+	call buildSlingApp id=testprogram target=html5
+	call buildSlingApp id=texttemplate target=netcore
+	call buildSlingApp id=todoapp target=html5
+	call buildSlingApp id=web1y target=netcore
+	call buildSlingApp id=web2y target=netcore
+	call buildSlingApp id=websocketclient target=html5
+	call buildSlingApp id=websockety target=netcore
 }
 
-buildSlingApp {
+buildSlingApp : id target {
 	info
 	info Building Sling app ${id} for target ${target}
 	info
-	eqela:sling/slingc src/sling/${id} -target=${target} -Dsling_project_version=${version} -libdir=${eqela:jkop}/src -output=build/app/${id}
+	eqela:slingc src/sling/${id} -target=${target} -Dsling_project_version=${version} -libdir=${eqela:jkop}/src -output=build/app/${id}
+}
+
+buildSrapiy {
+	use eqela:symlib:5.4.0
+	info
+	info Building Sling app srapiy for target netcore
+	info
+	eqela:slingc src/sling/srapiy -target=netcore -Dsling_project_version=${version} -libdir=${eqela:jkop}/src -libdir=${eqela:symlib}/src -output=build/app/srapiy
 }
 
 clean {
-	igelle:tools/delete build
+	eqela:jsh delete build
 }

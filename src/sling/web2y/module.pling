@@ -22,5 +22,4 @@
  * SOFTWARE.
  */
 
-title = "WebSocket Client Sample"
-preFilters += "@caveui"
+preFilters += "@sympathy"

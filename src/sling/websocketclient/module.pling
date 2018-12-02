@@ -22,13 +22,4 @@
  * SOFTWARE.
  */
 
-title = "Jkop Motion game in Sling"
-vendorId = "com.eqela"
-resources = [
-	"images",
-	"audio"
-]
-preFilters += "@motion"
-compilerOptions = {
-	"html5.readableCode" : "true"
-}
+preFilters += "@caveui"

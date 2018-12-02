@@ -25,6 +25,7 @@
 class:
 
 import capex.http
+import capex.console
 
 main
 {
@@ -66,7 +67,8 @@ main
 		PRINT "Unknown parameters. Giving up."
 		return 1
 	}
-	HTTPClient.executeForBuffer(httpc, req, func(resp as HTTPClientResponse, data as buffer) {
+	var ctx = new ConsoleApplicationContext()
+	HTTPClient.executeForBuffer(ctx, httpc, req, func(resp as HTTPClientResponse, data as buffer) {
 		assert resp {
 			PRINT("HTTP Request Failed")
 		}

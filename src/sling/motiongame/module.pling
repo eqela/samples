@@ -22,5 +22,11 @@
  * SOFTWARE.
  */
 
-title = "Sympathy Hello Server"
-preFilters += "@cape"
+resources = [
+	"images",
+	"audio"
+]
+preFilters += "@motion"
+compilerOptions = {
+	"html5.readableCode" : "true"
+}

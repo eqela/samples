@@ -22,5 +22,4 @@
  * SOFTWARE.
  */
 
-title = "Sling Text Template Sample"
-vendorId = "com.eqela"
+preFilters += "@sympathy"

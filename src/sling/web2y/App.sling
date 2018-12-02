@@ -61,5 +61,5 @@ GET "resources/*"
 		req.sendNotFound()
 		return
 	}
-	req.sendBuffer(data, MimeTypeRegistry.instance().getMimetype(name))
+	req.sendBuffer(data, MimeTypeRegistry.instance().getMimeType(name))
 }

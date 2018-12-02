@@ -22,5 +22,4 @@
  * SOFTWARE.
  */
 
-title = "Sling HTTP Client"
-preFilters += "@cape"
+preFilters += "@sympathy"

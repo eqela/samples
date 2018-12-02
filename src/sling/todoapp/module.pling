@@ -22,14 +22,9 @@
  * SOFTWARE.
  */
 
-title = "ToDo"
-
-preFilters += "@cape"
 preFilters += "@caveui"
 preFilters += "@capexDataModelSql"
-
 defines = {
 	"database" : "tododb"
 }
-
 resources = [ "images" ]
