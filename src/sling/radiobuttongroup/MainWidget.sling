@@ -44,6 +44,7 @@ func initializeWidget override
 	rbw.addWidgetItem("Apple", 0)
 	rbw.addWidgetItem("Banana", 1)
 	rbw.addWidgetItem("Cherry", 2)
+	rbw.setWidgetSelectedValue(0)
 	rbw.setWidgetChangeHandler(func {
 		Widget.removeChildrenOf(rBox)
 		rBox.addWidget(LabelWidget.forText(context, "You're favourite fruit is : " .. String.asString(rbw.getWidgetValue())))

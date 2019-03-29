@@ -24,7 +24,6 @@
 class is ScreenForWidget #screen #main:
 
 import cave.photo
-
 import cave.ui
 
 func initialize override
