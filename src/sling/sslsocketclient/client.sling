@@ -18,7 +18,7 @@ main
 		Log.error(ctx, "Failed to create SSL socket")
 		return 0
 	}
-	Log.debug(ctx, "SSLSocker successfully created")
+	Log.debug(ctx, "SSLSocket successfully created")
 	var data = String.toUTF8Buffer("Hello World")
 	Log.debug(ctx, "Sending data to server")
 	sslSocket.write(data, Buffer.getSize(data))
