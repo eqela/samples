@@ -1,0 +1,52 @@
+class:
+
+import cape
+import capex.console
+import capex.net
+
+main
+{
+	samplebackend.execute()
+}
+
+func execute static
+{
+	var ctx = new ConsoleApplicationContext()
+	ctx.setEnableDebugMessages(true)
+	var crt = File.forPath("C:/Keys/DebKeyStore.jks")
+	assert crt.isFile():
+		Log.error(ctx, "Crt file invalid")
+	var iomanager = IOManager.createDefault()
+	var socket = assert TCPSocket.createAndListen(8080) {
+		Log.error(ctx, "Failed to create and listen to port 8080")
+	}
+	var esk = assert iomanager.addWithReadListener(socket, func {
+		Log.debug(ctx, "New connection detected")
+		var connectedSocket = assert socket.accept() {
+			Log.error(ctx, "Failed to accept incoming connection")
+		}
+		Log.debug(ctx, "Connection accepted...")
+		var sslSocket = assert SSLSocket.forServer(connectedSocket, crt, null, ctx, false, "ramirez") {
+			Log.error(ctx, "Failed to create SSL socket")
+			connectedSocket.close()
+		}
+		Log.debug(ctx, "SSL socket created successfully")
+		var ioEntry = assert iomanager.add(connectedSocket) {
+			Log.error(ctx, "Failed to add connected socket to io manager")
+		}
+		ioEntry.setReadListener(func {
+			var buf = MALLOC(1024)
+			if sslSocket.read(buf) < 0 {
+				Log.error(ctx, "Failed to read incoming data. Closing connected socket" )
+				sslSocket.close()
+			}
+			else {
+				Log.debug(ctx, "Received message `" .. String.asString(buf) .. "'")
+			}
+			ioEntry.setReadListener(null)
+		})
+	})
+	assert iomanager.execute(ctx):
+		Log.error(ctx, "Failed to execute io manager")
+	Log.debug(ctx, "io exited normally")
+}
