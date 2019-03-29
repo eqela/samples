@@ -1,0 +1,37 @@
+
+class is ScreenForWidget #screen #main:
+
+import cave.ui
+import cape
+import cave
+import cave.notification
+
+func initialize override
+{
+	base.initialize()
+	setWidget(new FileWidget(context))
+}
+
+class FileWidget #widget
+{
+	ui LayerWidget
+	{
+		VerticalBoxWidget {
+			LabelWidget label {
+				text = "Notification"
+				textColor = Color.black()
+				fontFamily = "Raleway-Regular"
+				fontSize = context.getHeightValue("5mm")
+			}
+		}
+	}
+
+	func initializeWidget override
+	{
+		base.initializeWidget()
+		Widget.setWidgetClickHandler(label, func {
+			var notif = new Notification(context)
+			notif.show("Sample Notification", "You have a new message")
+		})
+	}
+}

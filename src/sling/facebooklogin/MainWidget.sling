@@ -1,0 +1,42 @@
+
+class is ScreenForWidget #screen #main:
+
+import cape
+import cave
+import cave.ui
+import cave.fb
+
+func initialize override
+{
+	base.initialize()
+	setWidget(new LoginWidget(context))
+}
+
+class LoginWidget #widget
+{
+	ui LayerWidget
+	{
+		VerticalBoxWidget {
+			LabelWidget fbLogin {
+				text = "Login with Facebook"
+				textColor = Color.black()
+				fontFamily = "Raleway-Regular"
+				fontSize = context.getHeightValue("5mm")
+			}
+		}
+	}
+
+	func initializeWidget override
+	{
+		base.initializeWidget()
+		Widget.setWidgetClickHandler(fbLogin, func {
+			var login = Login.forApplications(context, "118525458942705")
+			login.execute(this, func(userId as string, token as string, error as Error) {
+				assert not error:
+					PRINT error.toString()
+				PRINT userId
+				PRINT token
+			})
+		})
+	}
+}
