@@ -26,6 +26,9 @@ class #widget #main:
 
 ui LayerWidget
 {
+	CanvasWidget {
+		color = Color.instance("#949796")
+	}
 	VerticalBoxWidget vbox {
 		margin = context.getHeightValue("5000um")
 		spacing = context.getHeightValue("2000um")
