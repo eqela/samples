@@ -22,47 +22,4 @@
  * SOFTWARE.
  */
 
-class #widget #main:
-
-ui LayerWidget
-{
-	VerticalBoxWidget vbox {
-		margin = context.getHeightValue("5000um")
-		spacing = context.getHeightValue("2000um")
-		LabelWidget {
-			text = "Text Area Sample"
-			textColor = Color.black()
-			fontSize = context.getHeightValue("3mm")
-		}
-		TextInputWidget {
-			type = TextInputWidget.TYPE_EMAIL_ADDRESS
-			placeholder = "Email Address"
-			backgroundColor = Color.white()
-			fontSize = context.getHeightValue("2mm")
-			padding = context.getHeightValue("2500um")
-		}
-	}
-}
-
-func initializeWidget override
-{
-	var message = new TextAreaWidget(context)
-	message.setWidgetText("This is my message")
-	message.setWidgetRows(5)
-	message.setWidgetPadding(context.getHeightValue("2500um"))
-	message.setWidgetPlaceholder("Please enter your message.")
-	message.setWidgetMaxLength(100)
-	vbox.addWidget(message)
-	var sendLabel = LabelWidget.forText(context, "Send")
-	Widget.setWidgetClickHandler(sendLabel, func {
-		vbox.addWidget(getMessage(message.getWidgetText()))
-	})
-	vbox.addWidget(sendLabel)
-}
-
-func getMessage(str as string) as Widget
-{
-	var msg = new LabelWidget(context)
-	msg.setWidgetText(str)
-	return msg
-}
+preFilters += "@caveui"

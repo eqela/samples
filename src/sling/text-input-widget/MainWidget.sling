@@ -1,0 +1,133 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+class #widget #main:
+
+ui LayerWidget
+{
+	CanvasWidget {
+		color = Color.instance("#949796")
+	}
+	VerticalScrollerWidget {
+		AlignWidget {
+			VerticalBoxWidget vbox : 0.5, 0.5, true {
+				margin = context.getHeightValue("5000um")
+				spacing = context.getHeightValue("2000um")
+				LabelWidget {
+					text = "Text Input Sample"
+					textColor = Color.black()
+					fontSize = context.getHeightValue("3mm")
+				}
+				TextInputWidget firstname {
+					type = TextInputWidget.TYPE_NAME
+					placeholder = "First Name"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget lastName {
+					type = TextInputWidget.TYPE_NAME
+					placeholder = "Last Name"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget {
+					type = TextInputWidget.TYPE_NONASSISTED
+					placeholder = "Username"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget {
+					type = TextInputWidget.TYPE_PASSWORD
+					placeholder = "Password"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget {
+					type = TextInputWidget.TYPE_EMAIL_ADDRESS
+					placeholder = "Email Address"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget {
+					type = TextInputWidget.TYPE_URL
+					placeholder = "Website URL"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget {
+					type = TextInputWidget.TYPE_PHONE_NUMBER
+					placeholder = "Mobile Number"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget {
+					type = TextInputWidget.TYPE_INTEGER
+					placeholder = "Age"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+				TextInputWidget {
+					type = TextInputWidget.TYPE_FLOAT
+					placeholder = "Weight in kgs"
+					backgroundColor = Color.white()
+					fontSize = context.getHeightValue("2mm")
+					padding = context.getHeightValue("2500um")
+				}
+			}
+		}
+	}
+}
+
+func initializeWidget override
+{
+	var address = new TextInputWidget(context)
+	address.setWidgetType(TextInputWidget.TYPE_STREET_ADDRESS)
+	address.setWidgetPlaceholder("Home Address")
+	address.setWidgetTextAlign(TextInputWidget.ALIGN_LEFT)
+	address.setWidgetFontSize(context.getHeightValue("2mm"))
+	address.setWidgetPadding(context.getHeightValue("2500um"))
+	address.setWidgetTextColor(Color.black())
+	address.setWidgetBackgroundColor(Color.white())
+	vbox.addWidget(address)
+	var save = LabelWidget.forText(context, "Save")
+	Widget.setWidgetClickHandler(save, func {
+		vbox.addWidget(getFullName())
+	})
+	vbox.addWidget(save)
+}
+
+func getFullName as Widget
+{
+	var fullname = new LabelWidget(context)
+	fullname.setWidgetText("Name : " .. firstname.getWidgetText() .. " " .. lastName.getWidgetText())
+	return fullname
+}
