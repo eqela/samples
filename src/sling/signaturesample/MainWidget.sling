@@ -30,20 +30,20 @@ ui LayerWidget
 		spacing = context.getHeightValue("2000um")
 		SignatureWidget signature : 1.0 {
 		}
-		VerticalBoxWidget {
-			margin = context.getHeightValue("5000um")
-			spacing = context.getHeightValue("2000um")
-			LabelWidget captureSignature {
-				text = "Capture Signature"
-				textColor = Color.black()
-				fontFamily = "Times New Roman"
-				fontSize = context.getHeightValue("2mm")
-			}
-			LabelWidget clearSignature {
-				text = "Clear Signature"
-				textColor = Color.black()
-				fontFamily = "Times New Roman"
-				fontSize = context.getHeightValue("2mm")
+		AlignWidget {
+			VerticalBoxWidget {
+				margin = context.getHeightValue("5000um")
+				spacing = context.getHeightValue("2000um")
+				ButtonWidget captureSignature : 0.5 {
+					text = "Capture Signature"
+					textColor = Color.black()
+					fontSize = context.getHeightValue("2mm")
+				}
+				ButtonWidget clearSignature : 0.5 {
+					text = "Clear Signature"
+					textColor = Color.black()
+					fontSize = context.getHeightValue("2mm")
+				}
 			}
 		}
 	}
@@ -52,10 +52,10 @@ ui LayerWidget
 func initializeWidget override
 {
 	signature.setStrokeColor(Color.black())
-	Widget.setWidgetClickHandler(captureSignature, func {
+	captureSignature.setWidgetClickHandler(func {
 		signature.getSignatureAsImage()
 	})
-	Widget.setWidgetClickHandler(clearSignature, func {
+	clearSignature.setWidgetClickHandler(func {
 		signature.clear()
 	})
 }

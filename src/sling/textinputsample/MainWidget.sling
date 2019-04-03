@@ -38,6 +38,8 @@ ui LayerWidget
 					text = "Text Input Sample"
 					textColor = Color.black()
 					fontSize = context.getHeightValue("3mm")
+					textAlign = LabelWidget.ALIGN_CENTER
+					fontBold = true
 				}
 				TextInputWidget firstname {
 					type = TextInputWidget.TYPE_NAME
@@ -118,11 +120,11 @@ func initializeWidget override
 	address.setWidgetTextColor(Color.black())
 	address.setWidgetBackgroundColor(Color.white())
 	vbox.addWidget(address)
-	var save = LabelWidget.forText(context, "Save")
-	Widget.setWidgetClickHandler(save, func {
+	var savebtn = ButtonWidget.forText(context, "Save", func {
 		vbox.addWidget(getFullName())
 	})
-	vbox.addWidget(save)
+	savebtn.setWidgetFontSize(context.getHeightValue("2mm"))
+	vbox.addWidget(savebtn)
 }
 
 func getFullName as Widget

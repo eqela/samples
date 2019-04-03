@@ -36,6 +36,8 @@ ui LayerWidget
 			text = "Text Area Sample"
 			textColor = Color.black()
 			fontSize = context.getHeightValue("3mm")
+			textAlign = LabelWidget.ALIGN_CENTER
+			fontBold = true
 		}
 		TextInputWidget {
 			type = TextInputWidget.TYPE_EMAIL_ADDRESS
@@ -56,11 +58,11 @@ func initializeWidget override
 	message.setWidgetPlaceholder("Please enter your message.")
 	message.setWidgetMaxLength(100)
 	vbox.addWidget(message)
-	var sendLabel = LabelWidget.forText(context, "Send")
-	Widget.setWidgetClickHandler(sendLabel, func {
+	var sendbtn = ButtonWidget.forText(context, "Send", func{
 		vbox.addWidget(getMessage(message.getWidgetText()))
 	})
-	vbox.addWidget(sendLabel)
+	sendbtn.setWidgetFontSize(context.getHeightValue("2mm"))
+	vbox.addWidget(sendbtn)
 }
 
 func getMessage(str as string) as Widget
