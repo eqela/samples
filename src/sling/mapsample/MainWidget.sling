@@ -1,0 +1,74 @@
+
+class is ScreenForWidget #screen #main:
+
+import cave
+import cave.ui
+import cave.google.maps
+
+func initialize override
+{
+	base.initialize()
+	setWidget(new MapSampleWidget(context))
+}
+
+class MapSampleWidget #widget
+{
+	ui LayerWidget
+	{
+		VerticalBoxWidget vbox {
+			VerticalBoxWidget {
+				spacing = context.getHeightValue("2mm")
+				margin = context.getHeightValue("2mm")
+				LabelWidget lat {
+				}
+				LabelWidget lon {
+				}
+			}
+		}
+		AlignWidget {
+			ImageWidget marker : 0.5, 0.5 {
+				imageResource = "marker"
+				imageScaleMethod = ImageWidget.FIT
+				imageWidth = context.getHeightValue("6mm")
+				imageHeight = context.getHeightValue("6mm")
+			}
+		}
+	}
+
+	func initializeWidget override
+	{
+		base.initializeWidget()
+		var map = MapWidget.forApiKeys(context, "AIzaSyD_elYots3ZS4y0h-zX7J6w25gu1PYHJq8", "AIzaSyB4Pm3V_k5puJbABAnwMRG2mRrAVkHB1dQ")
+		map.setMapCanBeRotate(true)
+		map.setMapHasMyLocation(true)
+		map.setMapCanBeTilt(true)
+		map.setZoomInCenter(true)
+		map.setDefaultZoomLevel(15)
+		map.moveToCenter(14.4183645	, 121.0384987)
+		map.addMapClickHandler(func(lat as double, lon as double) {
+			map.moveToCenter(lat, lon)
+		})
+		map.setWidgetMapCameraStartMovingHandler(func {
+			lat.setWidgetText("Latitude :")
+			lon.setWidgetText("Longitude :")
+		})
+		map.setWidgetMapCameraStopMovingHandler(func {
+			var loc = map.getMapCenterLocationAsDynamicMap()
+			lat.setWidgetText("Latitude : " .. String.asString(loc.getDouble("latitude")))
+			lon.setWidgetText("Longitude : " .. String.asString(loc.getDouble("longitude")))
+		})
+		var marker = map.addMapMarker(14.417750765541284, 121.04133870452642, "Marker", "Alabang")
+		var infoCon = new LayerWithBackgroundColorWidget(context)
+		infoCon.setWidgetColor(Color.forRGB(188,215,255))
+		var azr = new LabelWidget(context)
+		var box = VerticalBoxWidget.forContext(context, context.getHeightValue("2mm"))
+		box.addWidget(LabelWidget.forText(context, "Alabang Festival"))
+		box.addWidget(azr)
+		infoCon.addWidget(box)
+		marker.setInfoWindowWidget(infoCon)
+		marker.setInfoWindowClickHandler(func {
+			azr.setWidgetText("Alabang - Zapote Road")
+		})
+		vbox.addWidget(map, 1.0)
+	}
+}
