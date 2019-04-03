@@ -35,10 +35,13 @@ class MapSampleWidget #widget
 		}
 	}
 
+	var androidAPIkey as string
+	var iOSAPIkey as string
+
 	func initializeWidget override
 	{
 		base.initializeWidget()
-		var map = MapWidget.forApiKeys(context, "AIzaSyD_elYots3ZS4y0h-zX7J6w25gu1PYHJq8", "AIzaSyB4Pm3V_k5puJbABAnwMRG2mRrAVkHB1dQ")
+		var map = MapWidget.forApiKeys(context, androidAPIkey, iOSAPIkey)
 		map.setMapCanBeRotate(true)
 		map.setMapHasMyLocation(true)
 		map.setMapCanBeTilt(true)
