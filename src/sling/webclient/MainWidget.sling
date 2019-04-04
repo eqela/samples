@@ -22,9 +22,27 @@
  * SOFTWARE.
  */
 
-preFilters += "@caveui"
-preFilters += "@cape"
+class #widget #main:
 
-resources = [
-	"images"
-]
+import cave.pim
+
+ui LayerWidget
+{
+	VerticalBoxWidget {
+		WebImageWidget photo {
+			imageScaleMethod = ImageWidget.FIT
+			imageWidth = context.getWidthValue("30mm")
+		}
+		ButtonWidget url {
+			text = "DISPLAY IMAGE FROM url : https://www.gstatic.com/webp/gallery3/1.png"
+		}
+	}
+}
+
+func initializeWidget override
+{
+	base.initializeWidget()
+	url.setWidgetClickHandler(func {
+		photo.setWidgetImageUrl("https://www.gstatic.com/webp/gallery3/1.png")
+	})
+}

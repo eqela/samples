@@ -22,9 +22,26 @@
  * SOFTWARE.
  */
 
-preFilters += "@caveui"
-preFilters += "@cape"
+class #widget #main:
 
-resources = [
-	"images"
-]
+import cave.google.fcm
+
+ui LayerWidget
+{
+	VerticalBoxWidget {
+		ButtonWidget fcm {
+			text = "GET FCM TOKEN"
+		}
+		LabelWidget displayfcm {
+		}
+	}
+}
+
+func initializeWidget override
+{
+	base.initializeWidget()
+	fcm.setWidgetClickHandler(func {
+		var fcmToken = FCMTokenManager.checkForToken()
+		displayfcm.setWidgetText(fcmToken)
+	})
+}
