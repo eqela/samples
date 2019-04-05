@@ -1,0 +1,25 @@
+class:
+
+import cape
+import capex.console
+import capex.net
+
+main
+{
+	var ctx = new ConsoleApplicationContext()
+	ctx.setEnableDebugMessages(true)
+	var socket = TCPSocket.createAndConnect("localhost", 8080)
+	if socket == null {
+		Log.error(ctx, "Failed to connect to server")
+	}
+	Log.debug(ctx, "Connected to server")
+	var sslSocket = SSLSocket.forClient(socket, "localhost", ctx, false, "ramirez")
+	if sslSocket == null {
+		Log.error(ctx, "Failed to create SSL socket")
+		return 0
+	}
+	Log.debug(ctx, "SSLSocket successfully created")
+	var data = String.toUTF8Buffer("Hello World")
+	Log.debug(ctx, "Sending data to server")
+	sslSocket.write(data, Buffer.getSize(data))
+}
