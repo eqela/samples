@@ -1,0 +1,46 @@
+
+class #widget:
+
+import cave.ui
+import cape
+
+ui LayerWidget
+{
+	CanvasWidget {
+		color = Color.instance("#356e8a")
+	}
+	AlignWidget {
+		VerticalBoxWidget : 0.5, 0.5, true {
+			margin = context.getHeightValue("5000um")
+			spacing = context.getHeightValue("2000um")
+			LabelWidget {
+				text = "Username"
+				textColor = Color.black()
+				fontFamily = "Raleway-Regular"
+				fontSize = context.getHeightValue("5mm")
+			}
+			TextInputWidget username {
+				id #common = "username"
+				type = TextInputWidget.TYPE_NONASSISTED
+				backgroundColor = Color.white()
+				fontSize = context.getHeightValue("5mm")
+				fontFamily = "Raleway-Regular"
+				padding = context.getHeightValue("2500um")
+			}
+			LabelWidget {
+				text = "Password"
+				textColor = Color.black()
+				fontFamily = "Times New Roman"
+				fontSize = context.getHeightValue("5mm")
+			}
+			TextInputWidget password {
+				id #common = "password"
+				type = TextInputWidget.TYPE_PASSWORD
+				backgroundColor = Color.white()
+				fontSize = context.getHeightValue("5mm")
+				fontFamily = "Times New Roman"
+				padding = context.getHeightValue("2500um")
+			}
+		}
+	}
+}
