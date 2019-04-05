@@ -74,7 +74,6 @@ func initializeWidget override
 	})
 }
 
-
 func onUploadPhoto
 {
 	var selector = new PhotoSelectorWidget(context)
