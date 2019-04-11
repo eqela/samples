@@ -31,7 +31,7 @@ func execute static
 			connectedSocket.close()
 		}
 		Log.debug(ctx, "SSL socket created successfully")
-		var ioEntry = assert iomanager.add(connectedSocket) {
+		var ioEntry = assert iomanager.add(sslSocket) {
 			Log.error(ctx, "Failed to add connected socket to io manager")
 		}
 		ioEntry.setReadListener(func {
