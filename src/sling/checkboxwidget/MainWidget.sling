@@ -28,15 +28,19 @@ ui AlignWidget
 {
 	VerticalBoxWidget {
 		spacing = context.getHeightValue("2mm")
+		LabelWidget label {
+			text = ""
+			textAlign = LabelWidget.ALIGN_CENTER
+		}
 		CheckBoxWidget ybox {
 			text = "Sample Checkbox"
 			textColor = Color.forString("blue")
-			checked = true
 		}
 		CheckBoxWidget xbox {
 			text = "Sample Checkbox with sans-serif-condensed font family"
 			textColor = Color.forString("blue")
 			fontFamily = "sans-serif-condensed"
+			checked = true
 		}
 		CheckBoxWidget zbox {
 			text = "Sample Checkbox with unibook font resource"
@@ -63,4 +67,21 @@ ui AlignWidget
 			textAlign = LabelWidget.ALIGN_CENTER
 		}
 	}
+}
+
+var isClicked = false
+
+func initializeWidget override
+{
+	base.initializeWidget()
+	Widget.setWidgetClickHandler(ybox, func {
+		if isClicked == false {
+			label.setWidgetText("Sample checkbox is clicked")
+			isClicked = true
+		}
+		else {
+			label.setWidgetText("")
+			isClicked = false
+		}
+	})
 }
