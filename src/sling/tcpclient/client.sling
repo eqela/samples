@@ -39,7 +39,7 @@ ui LayerWidget
 		}
 		TextInputWidget address {
 			backgroundColor = Color.white()
-			text = "192.168.43.196:8080"
+			placeholder = "Server Address"
 		}
 		HorizontalBoxWidget {
 			ButtonWidget : 1.0 {
