@@ -1,0 +1,152 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+class #widget #main:
+
+import capex.net
+
+ui LayerWidget
+{
+	CanvasWidget {
+		color = Color.forString("#CCCCCC")
+	}
+	VerticalBoxWidget {
+		margin = context.getHeightValue("2mm")
+		spacing = context.getHeightValue("2mm")
+		LabelWidget status {
+			text = "Status: Disconnected"
+		}
+		TextInputWidget address {
+			backgroundColor = Color.white()
+			placeholder = "Server Address"
+		}
+		HorizontalBoxWidget {
+			ButtonWidget : 1.0 {
+				text = "Connect"
+				clickHandler = func {
+					onConnect()
+				}
+			}
+			ButtonWidget : 1.0 {
+				text = "Connect SSL"
+				clickHandler = func {
+					onConnectSSL()
+				}
+			}
+		}
+		ButtonWidget {
+			text = "Disconnect"
+			clickHandler = func {
+				onDisconnect()
+			}
+		}
+		LabelWidget echo {
+			text = "SERVER ECHO: "
+		}
+		LayerWidget : 1.0 {
+		}
+		HorizontalBoxWidget {
+			TextInputWidget msg : 1.0 {
+				backgroundColor = Color.white()
+			}
+			ButtonWidget {
+				text = "SEND"
+				textColor = Color.white()
+				backgroundColor = Color.black()
+				clickHandler = func {
+					onSend()
+				}
+			}
+		}
+	}
+}
+
+var socket as TCPClient
+
+func onConnect
+{
+	var addr = address.getWidgetText()
+	assert String.isNotEmpty(addr)
+	if not socket:
+		socket = TCPClient.instance()
+	var comp = String.split(addr, ':')
+	socket.connect(comp[0], String.toInteger(comp[1]), func(error as Error) {
+		assert not error:
+			PRINT "Failed to connect to `" .. addr .. "' : ERROR -> " .. error.toString()
+		status.setWidgetText("Status: Connected")
+		socket.receive(onReceiveData)
+	})
+}
+
+func onConnectSSL
+{
+	var addr = address.getWidgetText()
+	assert String.isNotEmpty(addr)
+	if not socket:
+		socket = TCPClient.instance()
+	var comp = String.split(addr, ':')
+	socket.connectSSL(comp[0], String.toInteger(comp[1]), func(error as Error) {
+		assert not error:
+			PRINT "Failed to connect to `" .. addr .. "' : ERROR -> " .. error.toString()
+		status.setWidgetText("Status: Connected")
+		socket.receive(onReceiveData)
+	})
+}
+
+func onReceiveData(data as buffer, size as int)
+{
+	assert socket
+	if size < 0 {
+		socket = null
+		status.setWidgetText("Status: Disconnected")
+	}
+	else if size > 0 {
+		var bf = Buffer.getSubBuffer(data, 0, size)
+		var echomsg = String.asString(bf) .. "."
+		echo.setWidgetText("SERVER ECHO: " .. echomsg)
+	}
+	socket.receive(onReceiveData)
+}
+
+func onDisconnect
+{
+	assert socket
+	socket.disconnect(func(error as Error) {
+		assert not error:
+			PRINT "Failed to disconnect : ERROR -> " .. error.toString()
+		status.setWidgetText("Status: Disconnected")
+	})
+}
+
+func onSend
+{
+	assert socket
+	var str = msg.getWidgetText()
+	assert String.isNotEmpty(str)
+	var buf = String.toUTF8Buffer(str)
+	socket.send(buf, SIZE buf, func(error as Error) {
+		assert not error:
+			PRINT "Failed to send message : ERROR -> " .. error.toString()
+	})
+}
