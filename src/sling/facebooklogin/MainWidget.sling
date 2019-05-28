@@ -30,7 +30,7 @@ class LoginWidget #widget
 	{
 		base.initializeWidget()
 		Widget.setWidgetClickHandler(fbLogin, func {
-			var login = Login.forApplications(context, "118525458942705")
+			var login = Login.forApplications(context, "YOUR_APPLICATION_ID")
 			login.execute(this, func(userId as string, token as string, error as Error) {
 				assert not error:
 					PRINT error.toString()
