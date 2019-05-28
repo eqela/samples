@@ -22,7 +22,12 @@
  * SOFTWARE.
  */
 
-class is LayerWidget imports capex.crypto, capex.net #widget #main:
+class is LayerWidget #widget #main:
+
+import capex.crypto
+import capex.net
+import cave
+import cave.ui
 
 var socket as WSSocket
 var statusWidget as LabelWidget
@@ -37,7 +42,7 @@ func initializeWidget override
 	vbox.addWidget(messageWidget = new TextInputWidget(context))
 	vbox.addWidget(TextButtonWidget.forText(context, "connect", func {
 		statusWidget.setWidgetText("connecting..")
-		socket.connect("ws://echo.websocket.org", "no sub-protocols")
+		socket.connect("ws://echo.websocket.org")
 	}))
 	vbox.addWidget(TextButtonWidget.forText(context, "disconnect", func {
 		statusWidget.setWidgetText("disconnecting..")
@@ -57,9 +62,9 @@ func initializeWidget override
 		var text = String.forUTF8Buffer(message.getData())
 		statusWidget.setWidgetText("message from server: '" .. text .. "'")
 	})
-	socket.setOnErrorCallback(func {
+	socket.setOnErrorCallback(func(error as Error) {
 		var shaEncoder = assert SHAEncoder.create()
-		statusWidget.setWidgetText("error!")
+		statusWidget.setWidgetText("Error: " .. error.toString())
 	})
 	socket.setOnCloseCallback(func(e as WSCloseEvent) {
 		assert e.getReason() {
