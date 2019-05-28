@@ -25,7 +25,7 @@
 preFilters += "@caveui"
 
 androidMetaData = {
-	"com.google.android.geo.API_KEY" : "AIzaSyDFgjzx3Vg7j7qN51jm-qKDUfMkF6vBgvQ"
+	"com.google.android.geo.API_KEY" : "YOUR_API_KEY"
 }
 
 resources = [

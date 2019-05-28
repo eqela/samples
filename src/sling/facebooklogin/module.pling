@@ -26,6 +26,6 @@ preFilters += "@cape"
 preFilters += "@caveui"
 
 androidMetaData = {
-	"com.facebook.sdk.ApplicationId" : "118525458942705",
-	"com.google.android.geo.API_KEY" : "AIzaSyDFgjzx3Vg7j7qN51jm-qKDUfMkF6vBgvQ"
+	"com.facebook.sdk.ApplicationId" : "YOUR_APPLICATION_ID",
+	"com.google.android.geo.API_KEY" : "YOUR_API_KEY"
 }
