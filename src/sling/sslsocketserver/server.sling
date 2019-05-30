@@ -30,52 +30,67 @@ import capex.net
 
 main
 {
-	var v = new this()
-	v.execute()
+	if new this().execute(args) == false:
+		return 1
+	return 0
 }
 
-
-func execute
+func execute(args as array<string>) as bool
 {
+	var filePath as string
+	var passPhrase as string
+	var arguments = ConsoleApplication.parseCommandLineArguments(args)
+	foreach arg in arguments {
+		if arg.isOption("path") {
+			filePath = arg.getStringValue()
+		}
+		if arg.isOption("pass") {
+			passPhrase = arg.getStringValue()
+		}
+	}
 	var ctx = new ConsoleApplicationContext()
 	ctx.setEnableDebugMessages(true)
-	var crt = File.forPath("C:/Keys/DebKeyStore.jks")
-	assert crt.isFile():
-		Log.error(ctx, "Failed to get cert")
-	var iomanager = IOManager.createDefault()
-	var socket = assert TCPSocket.createAndListen(8080) {
-		Log.error(ctx, "Failed to create and listen to port 8080")
-	}
-	var esk = assert iomanager.addWithReadListener(socket, func {
-		Log.debug(ctx, "New connection detected")
-		var ss as ConnectedSocket
-		var connectedSocket = assert socket.accept() {
-			Log.error(ctx, "Failed to accept incoming connection")
+	if filePath {
+		var crt = File.forPath(filePath)
+		assert crt.isFile():
+			Log.error(ctx, "Failed to get cert")
+		var iomanager = IOManager.createDefault()
+		var socket = assert TCPSocket.createAndListen(8080) {
+			Log.error(ctx, "Failed to create and listen to port 8080")
 		}
-		Log.debug(ctx, "Connection accepted...")
-		var sslSocket = assert SSLSocket.forServer(connectedSocket, crt, null, ctx, true, "ramirez") {
-			Log.error(ctx, "Failed to create SSL socket")
-			connectedSocket.close()
-		}
-		ss = sslSocket
-		Log.debug(ctx, "SSL socket created successfully")
-		var ioEntry = assert iomanager.add(ss) {
-			Log.error(ctx, "Failed to add connected socket to io manager")
-		}
-		ioEntry.setReadListener(func {
-			var buf = MALLOC(1024)
-			var i = ss.read(buf)
-			if i < 0 {
-				Log.error(ctx, "Failed to read incoming data. Closing connected socket" )
-				ss.close()
+		var esk = assert iomanager.addWithReadListener(socket, func {
+			Log.debug(ctx, "New connection detected")
+			var ss as ConnectedSocket
+			var connectedSocket = assert socket.accept() {
+				Log.error(ctx, "Failed to accept incoming connection")
 			}
-			else {
-				Log.debug(ctx, "Received message `" .. String.asString(buf) .. "'")
+			Log.debug(ctx, "Connection accepted...")
+			var sslSocket = assert SSLSocket.forServer(connectedSocket, crt, null, ctx, true, passPhrase) {
+				Log.error(ctx, "Failed to create SSL socket")
+				connectedSocket.close()
 			}
-			ss.write(buf, i)
+			ss = sslSocket
+			Log.debug(ctx, "SSL socket created successfully")
+			var ioEntry = assert iomanager.add(ss) {
+				Log.error(ctx, "Failed to add connected socket to io manager")
+			}
+			ioEntry.setReadListener(func {
+				var buf = MALLOC(1024)
+				var i = ss.read(buf)
+				if i < 0 {
+					Log.error(ctx, "Failed to read incoming data. Closing connected socket" )
+					ss.close()
+				}
+				else {
+					Log.debug(ctx, "Received message `" .. String.asString(buf) .. "'")
+				}
+				ss.write(buf, i)
+			})
 		})
-	})
-	assert iomanager.execute(ctx):
-		Log.error(ctx, "Failed to execute io manager")
-	Log.debug(ctx, "io exited normally")
+		assert iomanager.execute(ctx):
+			Log.error(ctx, "Failed to execute io manager")
+		Log.debug(ctx, "io exited normally")
+		return true
+	}
+	return false
 }
