@@ -37,7 +37,7 @@ class MyClass #widget
 	ui LayerWidget
 	{
 		VerticalBoxWidget vb {
-			LabelWidget lbl {
+			TextButtonWidget btn {
 				text = "SELECT PHOTO"
 			}
 			ImageWidget image {
@@ -50,8 +50,8 @@ class MyClass #widget
 	{
 		base.initializeWidget()
 		var thisWidget = this
-		Widget.setWidgetClickHandler(lbl, func {
-			var selector = new PhotoSelectorWidget(context)
+		btn.setWidgetClickHandler(func {
+			var selector = new PhotoSelector(context)
 			selector.openPhotoDialog(this, func(img as Image, filename as string, err as Error) {
 				assert not err:
 					PRINT "error: " .. err.toString()
