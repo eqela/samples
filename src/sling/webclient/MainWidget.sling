@@ -25,16 +25,20 @@
 class #widget #main:
 
 import cave.pim
+import cave.ui
 
 ui LayerWidget
 {
+	CanvasWidget {
+		color = Color.white()
+	}
 	VerticalBoxWidget {
+		TextButtonWidget btn {
+			text = "DISPLAY IMAGE FROM https://www.gstatic.com/webp/gallery3/1.png"
+		}
 		WebImageWidget photo {
 			imageScaleMethod = ImageWidget.FIT
 			imageWidth = context.getWidthValue("30mm")
-		}
-		ButtonWidget url {
-			text = "DISPLAY IMAGE FROM url : https://www.gstatic.com/webp/gallery3/1.png"
 		}
 	}
 }
@@ -42,7 +46,7 @@ ui LayerWidget
 func initializeWidget override
 {
 	base.initializeWidget()
-	url.setWidgetClickHandler(func {
+	btn.setWidgetClickHandler(func {
 		photo.setWidgetImageUrl("https://www.gstatic.com/webp/gallery3/1.png")
 	})
 }

@@ -22,37 +22,4 @@
  * SOFTWARE.
  */
 
-class #widget #main:
-
-ui LayerWidget
-{
-	CanvasWidget {
-		color = Color.white()
-	}
-	VerticalBoxWidget vb {
-		LabelWidget label {
-			text = "CLICK ME"
-		}
-		LabelWidget lbl {
-			text = "MENUS"
-		}
-	}
-}
-
-func initializeWidget override
-{
-	base.initializeWidget()
-	var menu = new Menu()
-	menu.addEntry("Entry 1", func {
-		;
-	})
-	menu.addEntry("Entry 2", func {
-		;
-	})
-	menu.addEntry("Entry 3", func {
-		;
-	})
-	Widget.setWidgetClickHandler(label, func {
-		PopupMenu.showBelow(context, lbl, menu, context.getHeightValue("10mm"))
-	})
-}
+preFilters += "@caveui"
