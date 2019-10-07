@@ -28,26 +28,18 @@ import capex.crypto
 
 main
 {
-	var encipher = new AES128CipherGeneric()
-	encipher.setKey("HelloWorldSwift!")
-	encipher.setInitializationVector("HelloWorldSwift!")
+	var encipher = AES128Cipher.create("SampleAES128IVal", "Sample AES128Key")
 	var encrpyt = BlockCipher.encryptString("Hello World", encipher)
 	PRINT "Encrypt : " .. Base64Encoder.encode(encrpyt)
-	var decipher = new AES128CipherGeneric()
-	decipher.setKey("HelloWorldSwift!")
-	decipher.setInitializationVector("HelloWorldSwift!")
+	var decipher = AES128Cipher.create("SampleAES128IVal", "Sample AES128Key")
 	var decrypt = BlockCipher.decryptString(encrpyt, decipher)
 	PRINT "Decrypt : " .. decrypt
-	var encipher2 = new AES128CipherGeneric()
-	encipher2.setKey("JobAndEstherTech")
-	encipher2.setInitializationVector("JobAndEstherTech")
-	var file = File.forPath("D:/JEPROGRAMMING/md5sampleapp/server/Sampletext.txt")
+	var encipher2 = AES128Cipher.create("AES128FileSample", "encrypt Filecont")
+	var file = File.forPath(VALUE "samplePath")
 	var buf = file.getContentsBuffer()
 	var encrpyt2 = BlockCipher.encryptBuffer(buf, encipher2)
 	PRINT "Encrypt : " .. Base64Encoder.encode(encrpyt2)
-	var decipher2 = new AES128CipherGeneric()
-	decipher2.setKey("JobAndEstherTech")
-	decipher2.setInitializationVector("JobAndEstherTech")
+	var decipher2 = AES128Cipher.create("AES128FileSample", "encrypt Filecont")
 	var decrypt2 = BlockCipher.decryptBuffer(encrpyt2, decipher2)
 	PRINT "Decrypt : " .. String.forUTF8Buffer(decrypt2)
 }

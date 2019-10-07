@@ -23,3 +23,7 @@
  */
 
 preFilters += "@cape"
+
+defines = {
+	"samplePath" : "Sampletext.txt"
+}
