@@ -26,7 +26,10 @@ class #widget #main:
 
 ui LayerWidget
 {
-	LabelWidget showLbl {
+	CanvasWidget {
+		color = Color.white()
+	}
+	TextButtonWidget showLbl {
 		text = "SHOW POPUP"
 	}
 }
@@ -34,7 +37,7 @@ ui LayerWidget
 func initializeWidget override
 {
 	base.initializeWidget()
-	Widget.setWidgetClickHandler(showLbl, func {
+	showLbl.setWidgetClickHandler(func {
 		var popup = new PopupWidget(context)
 		popup.setWidgetContent(createPopupContent(popup))
 		popup.showPopup(this)
@@ -50,5 +53,8 @@ func createPopupContent(pp as PopupWidget) as Widget
 		pp.hidePopup()
 	})
 	vb.addWidget(b)
-	return vb
+	var lyr = new LayerWithBackgroundColorWidget(context)
+	lyr.setWidgetColor(Color.white())
+	lyr.addWidget(vb)
+	return lyr
 }

@@ -26,6 +26,9 @@ class #widget #main:
 
 ui LayerWidget
 {
+	CanvasWidget {
+		color = Color.white()
+	}
 	VerticalBoxWidget vb {
 		LabelWidget label {
 			text = "CLICK ME"
