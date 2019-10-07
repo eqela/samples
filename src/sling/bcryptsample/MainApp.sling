@@ -1,5 +1,7 @@
 class:
 
+import capex.crypto
+
 func main
 {
 	var bcrypt = BCryptEncoder.create()
