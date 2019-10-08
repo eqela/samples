@@ -22,17 +22,8 @@
  * SOFTWARE.
  */
 
-class:
+preFilters += "@cape"
 
-import capex.crypto
-
-main
-{
-	var bcrypt = BCryptEncoder.create()
-	var salt = bcrypt.generateSalt(12)
-	PRINT "Salt : " .. salt
-	var hash = bcrypt.hashPassword("Super@dm1n", salt)
-	PRINT "Hash Password : " .. hash
-	var cp = bcrypt.checkPassword("Super@dm1n", hash)
-	PRINT "Password is matched? : " .. String.asString(cp)
+defines = {
+	"samplePath" : "Sampletext.txt"
 }

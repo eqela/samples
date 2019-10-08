@@ -28,11 +28,18 @@ import capex.crypto
 
 main
 {
-	var bcrypt = BCryptEncoder.create()
-	var salt = bcrypt.generateSalt(12)
-	PRINT "Salt : " .. salt
-	var hash = bcrypt.hashPassword("Super@dm1n", salt)
-	PRINT "Hash Password : " .. hash
-	var cp = bcrypt.checkPassword("Super@dm1n", hash)
-	PRINT "Password is matched? : " .. String.asString(cp)
+	var encipher = AES128Cipher.create("SampleAES128IVal", "Sample AES128Key")
+	var encrpyt = BlockCipher.encryptString("Hello World", encipher)
+	PRINT "Encrypt : " .. Base64Encoder.encode(encrpyt)
+	var decipher = AES128Cipher.create("SampleAES128IVal", "Sample AES128Key")
+	var decrypt = BlockCipher.decryptString(encrpyt, decipher)
+	PRINT "Decrypt : " .. decrypt
+	var encipher2 = AES128Cipher.create("AES128FileSample", "encrypt Filecont")
+	var file = File.forPath(VALUE "samplePath")
+	var buf = file.getContentsBuffer()
+	var encrpyt2 = BlockCipher.encryptBuffer(buf, encipher2)
+	PRINT "Encrypt : " .. Base64Encoder.encode(encrpyt2)
+	var decipher2 = AES128Cipher.create("AES128FileSample", "encrypt Filecont")
+	var decrypt2 = BlockCipher.decryptBuffer(encrpyt2, decipher2)
+	PRINT "Decrypt : " .. String.forUTF8Buffer(decrypt2)
 }
