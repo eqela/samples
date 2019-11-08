@@ -48,11 +48,11 @@ ui LayerWidget
 func initializeWidget override
 {
 	base.initializeWidget()
-	var encipher = AES128Cipher.create("SampleAES128IVal", "Sample AES128Key")
-	var encrpyt = BlockCipher.encryptString("Hello World", encipher)
-	encryptedText.setWidgetText("Encrypted: " .. Base64Encoder.encode(encrpyt))
-	var decipher = AES128Cipher.create("SampleAES128IVal", "Sample AES128Key")
-	var decrypt = BlockCipher.decryptString(encrpyt, decipher)
+	var encipher = AES128Cipher.create("Sample AES128Key", "SampleAES128IVal")
+	var encrypt = BlockCipher.encryptString("Hello World", encipher)
+	encryptedText.setWidgetText("Encrypted: " .. Base64Encoder.encode(encrypt))
+	var decipher = AES128Cipher.create("Sample AES128Key", "SampleAES128IVal")
+	var decrypt = BlockCipher.decryptString(encrypt, decipher)
 	decryptedText.setWidgetText("Decrypted : " .. decrypt)
 	PRINT "Decrypt : " .. decrypt
 }
