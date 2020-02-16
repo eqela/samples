@@ -1,0 +1,85 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ * Copyright (c) 2018-2020 Eqela Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+class #dataModel:
+
+prop username as string #dataField #primary
+prop password as string #dataField
+
+func validate(callback as function<void, Error>)
+{
+	assert String.isNotEmpty(username):
+		callback(Error.instance("no_username", "Please specify your username."))
+	var length = String.getLength(username)
+	assert length >= 8 && length <= 15:
+		callback(Error.instance("invalid_username_length", "Please specify your username with a length from 8 to 15 characters long."))
+	var itr = assert String.iterate(username):
+		callback(Error.instance("internal_error", "Internal error occured."))
+	loop {
+		var c = itr.getNextChar()
+		if c < 1:
+			break
+		if((c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 48 && c <= 57)):
+			continue
+		callback(Error.instance("invalid_username", "Please specify your username with alphanumeric characters only (a-z, A-Z, 0-9)."))
+		return
+	}
+	assert String.isNotEmpty(password):
+		callback(Error.instance("no_password", "Please specify your password."))
+	length = String.getLength(password)
+	assert length >= 8 && length <= 15:
+		callback(Error.instance("invalid_password_length", "Please specify your password with atleast 8 characters long."))
+	var hasLowerAlpha = false
+	var hasUpperAlpha = false
+	var hasNumeric = false
+	var hasSpecial = false
+	assert itr = String.iterate(password):
+		callback(Error.instance("internal_error", "Internal error occured."))
+	loop {
+		var c = itr.getNextChar()
+		if c < 1:
+			break
+		if c > 32 && c < 127 {
+			if c >= 65 && c <= 90 {
+				hasUpperAlpha = true
+			}
+			else if c >= 97 && c <= 122 {
+				hasLowerAlpha = true
+			}
+			else if c >= 48 && c <= 57 {
+				hasNumeric = true
+			}
+			else {
+				hasSpecial = true
+			}
+			continue
+		}
+		callback(Error.instance("invalid_password", "Please specify your password with a combination of uppercase and lowercase characters, numeric characters, and special characters (but not whitespace characters)."))
+		return
+	}
+	assert hasLowerAlpha && hasUpperAlpha && hasNumeric && hasSpecial:
+		callback(Error.instance("invalid_password", "Please specify your password with a combination of uppercase and lowercase characters, numeric characters, and special characters (but not whitespace characters)."))
+	callback(null)
+}

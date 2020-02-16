@@ -1,0 +1,114 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ * Copyright (c) 2018-2020 Eqela Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+class:
+
+var db private static as SQLiteDatabase
+var ctx private static as LoggingContext
+
+func initialize(database as SQLiteDatabase, context as LoggingContext) static as bool
+{
+	assert database:
+		Log.error(context, "SQLite database object is null")
+	db = database
+	ctx = context
+	db.ensureTableExists(Todo.SQL.getTableInfo(Todo.MODEL_NAME))
+	return true
+}
+
+func generateId static as string
+{
+	var sb = new StringBuilder()
+	sb.append(new Random().nextInt())
+	sb.append(SystemClock.asSeconds())
+	return MD5Encoder.encode(sb.toString())
+}
+
+func addTodo(todoData as DynamicMap, callback as function<void, bool>) static
+{
+	assert callback
+	assert todoData:
+		callback(false)
+	var cb final = callback
+	Todo.SQL.insert(db, Todo.MODEL_NAME, Todo.forDynamicMap(todoData), func(success as bool) {
+		cb(success)
+	})
+}
+
+func getTodoByStatus(status as int, callback as function<void, DynamicVector>) static
+{
+	assert callback
+	var cb final = callback
+	Todo.SQL.queryByStatus(db, Todo.MODEL_NAME, status, 0, 0, [ SQLOrderingRule.forAscending("timeStamp") ], func(itr as Iterator<Todo>) {
+		assert itr:
+			cb(null)
+		var dv = new DynamicVector()
+		loop {
+			var t = itr.next() as Todo
+			if not t:
+				break
+			dv.append(t.toDynamicMap())
+		}
+		cb(dv)
+	})
+}
+
+func getTodos(callback as function<void, DynamicVector>) static
+{
+	assert callback
+	var cb final = callback
+	Todo.SQL.queryAll(db, Todo.MODEL_NAME, [ SQLOrderingRule.forAscending("timeStamp") ], func(itr as Iterator<Todo>) {
+		assert itr:
+			cb(null)
+		var dv = new DynamicVector()
+		loop {
+			var t = itr.next() as Todo
+			if not t:
+				break
+			dv.append(t.toDynamicMap())
+		}
+		cb(dv)
+	})
+}
+
+func updateTodo(todoData as DynamicMap, callback as function<void, bool>) static
+{
+	assert todoData
+	assert callback
+	var cb final = callback
+	Todo.SQL.update(db, Todo.MODEL_NAME, Todo.forDynamicMap(todoData), func(success as bool) {
+		cb(success)
+	})
+}
+
+func deleteTodo(todoData as DynamicMap, callback as function<void, bool>) static
+{
+	assert todoData
+	assert callback
+	var cb final = callback
+	Todo.SQL.deleteFromTable(db, Todo.MODEL_NAME, Todo.forDynamicMap(todoData), func(success as bool) {
+		cb(success)
+	})
+}

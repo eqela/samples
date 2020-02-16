@@ -1,7 +1,0 @@
-
-/*
- * This file is part of JEL SAMPLE APP
- */
-
-preFilters += "@cape"
-preFilters += "@caveui"

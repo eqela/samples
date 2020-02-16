@@ -1,0 +1,90 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ * Copyright (c) 2018-2020 Eqela Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+import jk.widget.common
+
+class #widget #main:
+
+ui AlignWidget
+{
+	VerticalBoxWidget {
+		spacing = context.getHeightValue("2mm")
+		LabelWidget label {
+			text = ""
+			textAlign = LabelWidget.ALIGN_CENTER
+		}
+		CheckBoxWidget ybox {
+			text = "Sample Checkbox"
+			textColor = Color.forString("blue")
+		}
+		CheckBoxWidget xbox {
+			text = "Sample Checkbox with sans-serif-condensed font family"
+			textColor = Color.forString("blue")
+			fontFamily = "sans-serif-condensed"
+			checked = true
+		}
+		CheckBoxWidget zbox {
+			text = "Sample Checkbox with unibook font resource"
+			textColor = Color.forString("blue")
+			fontResource = "unibook.otf"
+		}
+		ButtonWidget {
+			text = "Count checked checkboxes"
+			backgroundColor = Color.forString("orange")
+			textColor = Color.forString("white")
+			clickHandler = func {
+				var checks = 0
+				if xbox.getWidgetChecked():
+					checks++
+				if ybox.getWidgetChecked():
+					checks++
+				if zbox.getWidgetChecked():
+					checks++
+				myLabel.setWidgetText("Checked checkboxes : " .. String.asString(checks))
+			}
+		}
+		LabelWidget myLabel {
+			text = "Checked checkboxes : 1"
+			textAlign = LabelWidget.ALIGN_CENTER
+		}
+	}
+}
+
+var isClicked = false
+
+func initializeWidget override
+{
+	base.initializeWidget()
+	Widget.setWidgetClickHandler(ybox, func {
+		if isClicked == false {
+			label.setWidgetText("Sample checkbox is clicked")
+			isClicked = true
+		}
+		else {
+			label.setWidgetText("")
+			isClicked = false
+		}
+	})
+}

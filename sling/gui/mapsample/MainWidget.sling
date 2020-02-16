@@ -1,0 +1,100 @@
+
+/*
+ * This file is part of Eqela Samples
+ * Copyright (c) 2016-2018 Job and Esther Technologies Oy
+ * Copyright (c) 2018-2020 Eqela Oy
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+import jk.widget
+import jk.widget.google.maps
+
+class is ScreenForWidget #screen #main:
+
+func initialize override
+{
+	base.initialize()
+	setWidget(new MapSampleWidget(context))
+}
+
+class MapSampleWidget #widget
+{
+	ui LayerWidget
+	{
+		VerticalBoxWidget vbox {
+			VerticalBoxWidget {
+				spacing = context.getHeightValue("2mm")
+				margin = context.getHeightValue("2mm")
+				LabelWidget lat {
+				}
+				LabelWidget lon {
+				}
+			}
+		}
+		AlignWidget {
+			ImageWidget marker : 0.5, 0.5 {
+				imageResource = "marker"
+				imageScaleMethod = ImageWidget.FIT
+				imageWidth = context.getHeightValue("6mm")
+				imageHeight = context.getHeightValue("6mm")
+			}
+		}
+	}
+
+	var androidAPIkey as string
+	var iOSAPIkey as string
+
+	func initializeWidget override
+	{
+		base.initializeWidget()
+		var map = MapWidget.forApiKeys(context, androidAPIkey, iOSAPIkey)
+		map.setMapCanBeRotate(true)
+		map.setMapHasMyLocation(true)
+		map.setMapCanBeTilt(true)
+		map.setZoomInCenter(true)
+		map.setDefaultZoomLevel(15)
+		map.moveToCenter(14.4183645	, 121.0384987)
+		map.addMapClickHandler(func(lat as double, lon as double) {
+			map.moveToCenter(lat, lon)
+		})
+		map.setWidgetMapCameraStartMovingHandler(func {
+			lat.setWidgetText("Latitude :")
+			lon.setWidgetText("Longitude :")
+		})
+		map.setWidgetMapCameraStopMovingHandler(func {
+			var loc = map.getMapCenterLocationAsDynamicMap()
+			lat.setWidgetText("Latitude : " .. String.asString(loc.getDouble("latitude")))
+			lon.setWidgetText("Longitude : " .. String.asString(loc.getDouble("longitude")))
+		})
+		var marker = map.addMapMarker(14.417750765541284, 121.04133870452642, "Marker", "Alabang")
+		var infoCon = new LayerWithBackgroundColorWidget(context)
+		infoCon.setWidgetColor(Color.forRGB(188,215,255))
+		var azr = new LabelWidget(context)
+		var box = VerticalBoxWidget.forContext(context, context.getHeightValue("2mm"))
+		box.addWidget(LabelWidget.forText(context, "Alabang Festival"))
+		box.addWidget(azr)
+		infoCon.addWidget(box)
+		marker.setInfoWindowWidget(infoCon)
+		marker.setInfoWindowClickHandler(func {
+			azr.setWidgetText("Alabang - Zapote Road")
+		})
+		vbox.addWidget(map, 1.0)
+	}
+}
