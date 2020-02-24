@@ -23,4 +23,14 @@
  * SOFTWARE.
  */
 
-libraries = [ "jkop:20200224" ]
+import jk.http.worker
+
+class:
+
+main
+{
+	var req = HTTPWorkerRequest.instance()
+	var resp = new HTTPWorkerResponse()
+	resp.setResponseText("Hello world " .. req.getPath())
+	resp.send()
+}
