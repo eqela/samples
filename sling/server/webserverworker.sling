@@ -23,14 +23,16 @@
  * SOFTWARE.
  */
 
+import jk.server.web
 import jk.http.worker
 
-class:
+class is WebServer:
 
-main
+class MyHandler is HTTPWorkerHandler
 {
-	var req = HTTPWorkerRequest.instance()
-	var resp = new HTTPWorkerResponse()
-	resp.setResponseText("Hello world " .. req.getPath())
-	resp.send()
+	func handleRequest(req as HTTPWorkerRequest, resp as HTTPWorkerResponse) override:
+		resp.setResponseText("Hello world " .. req.getPath())
 }
+
+main:
+	return new this().setWorker(typeinfo MyHandler).executeMain(args)

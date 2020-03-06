@@ -24,16 +24,27 @@
  */
 
 import jk.io
+import jk.fs
 import jk.thread
 
 class:
 
+func threadMain static
+{
+	var output = PrintWriterWrapper.forWriter(SushiThread.getOutputWriter())
+	output.print("THIS IS FROM THE THREAD. Our input was: `" .. String.forUTF8Buffer(SushiThread.getInputBuffer()))
+}
+
 main
 {
-	var writer = PrintWriterWrapper.forWriter(SushiThread.getOutputWriter())
-	var input = String.forUTF8Buffer(SushiThread.getInputBuffer())
-	writer.print("Superman is coming! ")
-	writer.print("Our input was `" .. input .. "'")
-	CurrentThread.sleepSeconds(1)
-	writer.print(" .. And some more text")
+	var thread = SushiThread.forThisProgram()
+	var input = String.toUTF8Buffer("Hello Thread")
+	var pipe = PrintReader.forReaderAndEncoding(thread.startPiped("sushithread.sushithread.threadMain()", input), "UTF-8")
+	if not pipe {
+		println "Failed to start thread"
+		return
+	}
+	var data = pipe.readAll()
+	pipe.close()
+	println "Thread output: `" .. data .. "'"
 }

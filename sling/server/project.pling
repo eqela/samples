@@ -23,4 +23,4 @@
  * SOFTWARE.
  */
 
-libraries = [ "jkop:20200215" ]
+libraries = [ "jkop:20200306" ]
