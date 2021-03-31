@@ -24,25 +24,18 @@
  */
 
 import jk.widget.common
-import jk.widget.datagrid
 
 class #widget #main:
 
 ui LayerWidget
 {
 	CanvasWidget {
-		color = Color.forString("#CCCCCC")
+		color = Color.forString("#FFFFFF")
 	}
 	VerticalBoxWidget {
-		margin = context.getHeightValue("1mm")
-		spacing = context.getHeightValue("1mm")
-		DataGridWidget grid : 1.0 {
-		}
-		ButtonWidget {
-			text = "Click me"
-			clickHandler = func {
-				PRINT "CLICKED!"
-			}
+		margin = 0
+		spacing = 0
+		MenuBarWidget menu {
 		}
 	}
 }
@@ -50,18 +43,24 @@ ui LayerWidget
 func initializeWidget override
 {
 	base.initializeWidget()
-	grid.addColumn("#", "number", 0.2)
-	grid.addColumn("Name", "name", 1.0)
-	grid.addColumn("Cost", "cost", 0.2, DataGridWidget.ALIGN_RIGHT)
-	grid.addWidgetHeaderRow()
-	grid.addRow([ "0", "Some testing stuff", "PHP1,000.00" ], func {
-		context.showMessageDialog("hello", "First one selected")
-	}, func {
-		context.showMessageDialog("hello", "First one double clicked")
+	var file = menu.addMenu("File")
+	file.addEntry("Open", func {
+		println "Open"
 	})
-	grid.addRow([ "1", "Another something", "PHP2,000.00" ], func {
-		context.showMessageDialog("hello", "Second one selected")
-	}, func {
-		context.showMessageDialog("hello", "Second one double clicked")
+	file.addEntry("Save", func {
+		println "Save"
+	})
+	file.addEntry("Exit", func {
+		println "Exit"
+	})
+	var edit = menu.addMenu("Edit")
+	edit.addEntry("Cut", func {
+		println "Cut"
+	})
+	edit.addEntry("Copy", func {
+		println "Copy"
+	})
+	edit.addEntry("Paste", func {
+		println "Paste"
 	})
 }

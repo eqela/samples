@@ -1,0 +1,10 @@
+{
+	vendorId "eqela"
+	projectId "todoapp"
+	title "Eqela Samples Todo App"
+	copyright "Copyright (c) 2018-2020 Eqela Oy"
+	license "All rights reserved."
+	libraries [
+		"jk-app:0.26.0"
+	]
+}
