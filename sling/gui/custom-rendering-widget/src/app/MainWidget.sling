@@ -23,44 +23,37 @@
  * SOFTWARE.
  */
 
-import jk.widget.common
+import jk.render
 
 class #widget #main:
 
-ui LayerWidget
+class MyCustomWidget is RenderableWidget #widget
 {
-	CanvasWidget {
-		color = Color.forString("#FFFFFF")
-	}
-	VerticalBoxWidget {
-		margin = 0
-		spacing = 0
-		MenuBarWidget menu {
-		}
+	pvar widgetText as string
+	pvar widgetImage as Image
+
+	func render(ctx as RenderingContext) override
+	{
+		ctx.setFillStyle(Color.black())
+		ctx.fillRect(0, 0, Widget.getWidth(this), Widget.getHeight(this))
+		ctx.setFillStyle(Color.forString("red"))
+		ctx.fillRect(100, 100, 100, 100)
+		ctx.setFillStyle(Color.white())
+		var myfont = new FontDescription()
+		myfont.setName("Arial")
+		myfont.setSize(Length.forPoints(50))
+		ctx.setFont(myfont)
+		ctx.setTextBaseline(RenderingContext.BASELINE_MIDDLE)
+		ctx.fillText(widgetText, 250, 150, 0)
+		ctx.drawAndScaleImage(widgetImage, 100, 250, 100, 100)
+		ctx.fillText("Eqela Development", 250, 300, 0)
 	}
 }
 
-func initializeWidget override
+ui LayerWidget
 {
-	base.initializeWidget()
-	var file = menu.addMenu("File")
-	file.addEntry("Open", func {
-		PRINT "Open"
-	})
-	file.addEntry("Save", func {
-		PRINT "Save"
-	})
-	file.addEntry("Exit", func {
-		PRINT "Exit"
-	})
-	var edit = menu.addMenu("Edit")
-	edit.addEntry("Cut", func {
-		PRINT "Cut"
-	})
-	edit.addEntry("Copy", func {
-		PRINT "Copy"
-	})
-	edit.addEntry("Paste", func {
-		PRINT "Paste"
-	})
+	MyCustomWidget {
+		text = "This is custom rendering"
+		image = context.getResourceImage("eqelalogo")
+	}
 }

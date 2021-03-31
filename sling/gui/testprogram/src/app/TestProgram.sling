@@ -100,7 +100,7 @@ func initialize override
 	base.initialize()
 	var navi = new NavigationWidget(context)
 	var ff = FormWidget.forDeclaration(context, FormDeclaration.forDescription(context, TEXTFILE "myform.form"))
-	ff.setActionHandlers({
+	ff.setActionHandlers(func {
 		"onClickMe" : func {
 			println JSONEncoder.encode(ff.getFormData())
 		},

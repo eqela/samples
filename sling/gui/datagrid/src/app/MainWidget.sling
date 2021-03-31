@@ -24,27 +24,24 @@
  */
 
 import jk.widget.common
+import jk.widget.datagrid
 
 class #widget #main:
 
 ui LayerWidget
 {
+	CanvasWidget {
+		color = Color.forString("#CCCCCC")
+	}
 	VerticalBoxWidget {
-		margin = context.getHeightValue("5000um")
-		spacing = context.getHeightValue("2000um")
-		LabelWidget {
-			text = "Hyperlink Sample"
-			textColor = Color.black()
-			fontFamily = "Times New Roman"
-			fontSize = context.getHeightValue("5mm")
+		margin = context.getHeightValue("1mm")
+		spacing = context.getHeightValue("1mm")
+		DataGridWidget grid : 1.0 {
 		}
-		HorizontalBoxWidget hbox {
-			spacing = context.getHeightValue("2000um")
-			LabelWidget {
-				text = "Click the link to print"
-				textColor = Color.black()
-				fontFamily = "Times New Roman"
-				fontSize = context.getHeightValue("3mm")
+		ButtonWidget {
+			text = "Click me"
+			clickHandler = func {
+				print "CLICKED!"
 			}
 		}
 	}
@@ -52,13 +49,19 @@ ui LayerWidget
 
 func initializeWidget override
 {
-	var link = new HyperLinkWidget(context)
-	link.setWidgetText("Hello World")
-	link.setWidgetTextColor(Color.black())
-	link.setWidgetFontSize(context.getHeightValue("3mm"))
-	link.setWidgetTextColor(Color.forRGB(255, 0, 0))
-	link.setWidgetClickHandler(func {
-		PRINT "Hello World!"
+	base.initializeWidget()
+	grid.addColumn("#", "number", 0.2)
+	grid.addColumn("Name", "name", 1.0)
+	grid.addColumn("Cost", "cost", 0.2, DataGridWidget.ALIGN_RIGHT)
+	grid.addWidgetHeaderRow()
+	grid.addRow([ "0", "Some testing stuff", "PHP1,000.00" ], func {
+		context.showMessageDialog("hello", "First one selected")
+	}, func {
+		context.showMessageDialog("hello", "First one double clicked")
 	})
-	hbox.addWidget(link)
+	grid.addRow([ "1", "Another something", "PHP2,000.00" ], func {
+		context.showMessageDialog("hello", "Second one selected")
+	}, func {
+		context.showMessageDialog("hello", "Second one double clicked")
+	})
 }

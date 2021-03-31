@@ -23,37 +23,42 @@
  * SOFTWARE.
  */
 
-import jk.render
+import jk.widget.common
 
 class #widget #main:
 
-class MyCustomWidget is RenderableWidget #widget
+ui LayerWidget
 {
-	prop widgetText as string
-	prop widgetImage as Image
-
-	func render(ctx as RenderingContext) override
-	{
-		ctx.setFillStyle(Color.black())
-		ctx.fillRect(0, 0, Widget.getWidth(this), Widget.getHeight(this))
-		ctx.setFillStyle(Color.forString("red"))
-		ctx.fillRect(100, 100, 100, 100)
-		ctx.setFillStyle(Color.white())
-		var myfont = new FontDescription()
-		myfont.setName("Arial")
-		myfont.setSize(Length.forPoints(50))
-		ctx.setFont(myfont)
-		ctx.setTextBaseline(RenderingContext.BASELINE_MIDDLE)
-		ctx.fillText(widgetText, 250, 150, 0)
-		ctx.drawAndScaleImage(widgetImage, 100, 250, 100, 100)
-		ctx.fillText("Eqela Development", 250, 300, 0)
+	VerticalBoxWidget {
+		margin = context.getHeightValue("5000um")
+		spacing = context.getHeightValue("2000um")
+		LabelWidget {
+			text = "Hyperlink Sample"
+			textColor = Color.black()
+			fontFamily = "Times New Roman"
+			fontSize = context.getHeightValue("5mm")
+		}
+		HorizontalBoxWidget hbox {
+			spacing = context.getHeightValue("2000um")
+			LabelWidget {
+				text = "Click the link to print"
+				textColor = Color.black()
+				fontFamily = "Times New Roman"
+				fontSize = context.getHeightValue("3mm")
+			}
+		}
 	}
 }
 
-ui LayerWidget
+func initializeWidget override
 {
-	MyCustomWidget {
-		text = "This is custom rendering"
-		image = context.getResourceImage("eqelalogo")
-	}
+	var link = new HyperLinkWidget(context)
+	link.setWidgetText("Hello World")
+	link.setWidgetTextColor(Color.black())
+	link.setWidgetFontSize(context.getHeightValue("3mm"))
+	link.setWidgetTextColor(Color.forRGB(255, 0, 0))
+	link.setWidgetClickHandler(func {
+		print "Hello World!"
+	})
+	hbox.addWidget(link)
 }
